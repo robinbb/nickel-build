@@ -4,6 +4,7 @@
 # file) in the Nix store.
 
 require "json"
+require "open3"
 
 json_file = ARGV[0]
 
@@ -40,6 +41,12 @@ def validate(d)
       raise "The derivation's \"env\" key must not have an output key (\"#{output}\")."
     end
     check_for(outputs[output], "path", String)
+    path = outputs[output]["path"]
+    if path.empty?
+      outputs[output]["path"] = "/nix/store/00000000000000000000000000000000-fakepath"
+    else
+      raise "The derivation's 'output' key has an output ('#{output}') with a 'path' key that is not an empty string."
+    end
   end
 end
 
@@ -51,21 +58,51 @@ def add_outputs_to_env!(d)
   end
 end
 
+def json_out(json)
+  JSON.pretty_generate(json)
+end
+
+def update_store_paths!(d, drv)
+  outputs = d["outputs"]
+  env = d["env"]
+  outputs.each_key do |output|
+    outputs[output]["path"] = drv
+    env[output] = drv
+  end
+end
+
 def transform(derivation)
+  warn "Transforming #{json_out(derivation)}"
   validate(derivation)
-  puts "Transforming #{derivation}"
   add_outputs_to_env!(derivation)
-  puts "Transformed derivation:\n#{derivation}"
+  warn "Transformed derivation:\n#{json_out(derivation)}"
+
+  # Attempt to add the derivation to the Nix store in order to obtain an error
+  # message that tells the correct output path.
+  #
+  _stdout, stderr, _status = Open3.capture3("nix derivation add", stdin_data: json_out(derivation))
+  drv_output = stderr[/should be '([^']+)'/, 1]
+  warn "drv_output = #{drv_output}"
+  update_store_paths!(derivation, drv_output)
+
+  # Add the now-correct derivation to the Nix store. This validates it and
+  # makes it possible to realise. Use 'nix derivation add' again.
+  #
+  stdout, _stderr, _status = Open3.capture3("nix derivation add", stdin_data: json_out(derivation))
+  drv = stdout
+
+  puts "drv = #{drv}"
 end
 
 begin
-  json_data = JSON.parse(File.read(json_file))
-  puts "Successfully parsed JSON data from #{json_file}"
-  transform(json_data)
+  derivation = JSON.parse(File.read(json_file))
+  warn "Successfully parsed JSON data from #{json_file}"
+  transform(derivation)
+  puts JSON.pretty_generate(derivation)
 rescue Errno::ENOENT
-  puts "Error: File #{json_file} doesn't exist"
+  warn "Error: File #{json_file} doesn't exist"
 rescue JSON::ParserError
-  puts "Error: Invalid JSON format in #{json_file}."
+  warn "Error: Invalid JSON format in #{json_file}."
 rescue => e
-  puts "Unexpected error: #{e.message}"
+  warn "Unexpected error: #{e.message}"
 end

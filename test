@@ -5,4 +5,4 @@ set -eu
 
 standardrb ./src/
 ./tests/realise-minimal-derivations
-./src/derivations-from-json.rb tests/nickel-derivation.json 
+./src/derivations-from-json.rb tests/nickel-derivation.json

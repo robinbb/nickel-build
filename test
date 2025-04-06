@@ -6,6 +6,7 @@ def run(cmd, *args)
   system(cmd, *args) || abort("Failed running #{cmd}")
 end
 
+run "nixfmt --check flake.nix"
 run "standardrb", "./src/", "./test"
 run "nix derivation add < tests/minimal-well-formed-derivation.json"
 run "nix derivation add < tests/minimal-derivation.json"

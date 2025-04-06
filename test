@@ -1,8 +1,11 @@
-#!/bin/sh
+#!/usr/bin/env -S ruby -w
 
-set -x
-set -eu
+require "open3"
 
-standardrb ./src/
-./tests/realise-minimal-derivations
-./src/derivations-from-json.rb tests/nickel-derivation.json
+def run(cmd, *args)
+  system(cmd, *args) || abort("Failed running #{cmd}")
+end
+
+run "standardrb", "./src/", "./test"
+run "./tests/realise-minimal-derivations"
+run "./src/derivations-from-json.rb", "tests/nickel-derivation.json"

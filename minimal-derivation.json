@@ -1,0 +1,18 @@
+{ "name": "minimal-derivation"
+, "outputs":
+    { "out":
+      { "path": "/nix/store/87l3bmm1f1pg9swzksmsz2v89lv6782p-minimal-derivation"
+      }
+    }
+, "inputSrcs": []
+, "inputDrvs": {}
+, "system": "x86_64-linux"
+, "builder": "/bin/sh"
+, "args":
+    [ "-c"
+    , "echo \"hello\" > $out"
+    ]
+, "env":
+    { "out": "/nix/store/87l3bmm1f1pg9swzksmsz2v89lv6782p-minimal-derivation"
+    }
+}

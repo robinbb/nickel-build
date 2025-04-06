@@ -1,0 +1,11 @@
+{ "name": ""
+, "outputs":
+  { "out": {}
+  }
+, "inputSrcs": []
+, "inputDrvs": {}
+, "system": ""
+, "builder": ""
+, "args": []
+, "env": {}
+}

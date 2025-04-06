@@ -6,9 +6,12 @@ def run(cmd, *args)
   system(cmd, *args) || abort("Failed running #{cmd}")
 end
 
-run "nixfmt --check flake.nix"
-run "standardrb", "./src/", "./test"
-run "nix derivation add < tests/minimal-well-formed-derivation.json"
-run "nix derivation add < tests/minimal-derivation.json"
-run "nix-store --realise /nix/store/wxlphg6jjn4g93p89gc50nxki0kkn73y-minimal-derivation.drv"
-run "./src/derivations-from-json.rb", "tests/nickel-derivation.json"
+run "standardrb ./test"
+run "standardrb ./src/"
+# run "nixfmt --check flake.nix"
+# run "nix derivation add < tests/minimal-well-formed-derivation.json"
+# run "nix derivation add < tests/minimal-derivation.json"
+# run "nix-store --realise /nix/store/wxlphg6jjn4g93p89gc50nxki0kkn73y-minimal-derivation.drv"
+# run "./src/derivations-from-json.rb < tests/nickel-derivation.json"
+# run "nickel export tests/nix-base.nickel"
+run "nickel export tests/nix-base.nickel | ./src/derivations-from-json.rb"

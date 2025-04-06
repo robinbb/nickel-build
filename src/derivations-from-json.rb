@@ -6,8 +6,6 @@
 require "json"
 require "open3"
 
-json_file = ARGV[0]
-
 def check_for(struct, key_name, value_kind)
   unless struct.is_a?(Hash)
     raise "check_for only works on Hashes"
@@ -103,16 +101,14 @@ def build_drv(drv_filename)
 end
 
 begin
-  derivation = JSON.parse(File.read(json_file))
-  warn "Successfully parsed JSON data from #{json_file}"
+  derivation = JSON.parse($stdin.read)
+  warn "Successfully parsed JSON data from STDIN."
   transform(derivation)
   # warn JSON.pretty_generate(derivation)
   store_drv = add_to_store(derivation)
   build_drv(store_drv)
-rescue Errno::ENOENT
-  warn "Error: File #{json_file} doesn't exist"
-rescue JSON::ParserError
-  warn "Error: Invalid JSON format in #{json_file}."
+rescue JSON::ParserError => e
+  warn "Error parsing JSON: #{e.message}"
 rescue => e
   warn "Unexpected error: #{e.message}"
 end

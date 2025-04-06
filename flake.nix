@@ -23,6 +23,7 @@
           mkShell {
             buildInputs = [
               git
+              nickel
               nix
               nixfmt-rfc-style
               rubyPackages.standard

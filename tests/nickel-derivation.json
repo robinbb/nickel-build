@@ -1,0 +1,16 @@
+{ "name": "nickel-derivation"
+, "outputs":
+    { "out":
+      { "path": ""
+      }
+    }
+, "inputSrcs": []
+, "inputDrvs": {}
+, "system": "x86_64-linux"
+, "builder": "/bin/sh"
+, "args":
+    [ "-c"
+    , "echo \"hello\" > $out"
+    ]
+, "env": {}
+}

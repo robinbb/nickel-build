@@ -16,6 +16,7 @@
           buildInputs = [
             git
             nix
+            rubyPackages.standard
             ruby
           ];
       };

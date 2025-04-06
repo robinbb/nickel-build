@@ -1,0 +1,3 @@
+nix derivation add < tests/minimal-well-formed-derivation.json
+nix derivation add < tests/minimal-derivation.json
+nix-store --realise /nix/store/wxlphg6jjn4g93p89gc50nxki0kkn73y-minimal-derivation.drv

@@ -2,4 +2,4 @@
 
 set -eu
 
-./realise-minimal-derivations
+./tests/realise-minimal-derivations

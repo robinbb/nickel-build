@@ -1,5 +1,5 @@
 #! /usr/bin/env -S ruby -w
-#
+
 # Transforms a JSON file with the proper structure into a Nix derivation (.drv
 # file) in the Nix store.
 
@@ -84,21 +84,31 @@ def transform(derivation)
   drv_output = stderr[/should be '([^']+)'/, 1]
   warn "drv_output = #{drv_output}"
   update_store_paths!(derivation, drv_output)
+end
 
+def add_to_store(derivation)
   # Add the now-correct derivation to the Nix store. This validates it and
   # makes it possible to realise. Use 'nix derivation add' again.
   #
   stdout, _stderr, _status = Open3.capture3("nix derivation add", stdin_data: json_out(derivation))
   drv = stdout
 
-  puts "drv = #{drv}"
+  warn "drv = #{drv}"
+  drv
+end
+
+def build_drv(drv_filename)
+  output = `nix-store --realise #{drv_filename}`
+  puts output
 end
 
 begin
   derivation = JSON.parse(File.read(json_file))
   warn "Successfully parsed JSON data from #{json_file}"
   transform(derivation)
-  puts JSON.pretty_generate(derivation)
+  # warn JSON.pretty_generate(derivation)
+  store_drv = add_to_store(derivation)
+  build_drv(store_drv)
 rescue Errno::ENOENT
   warn "Error: File #{json_file} doesn't exist"
 rescue JSON::ParserError

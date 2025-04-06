@@ -1,5 +1,8 @@
 #!/bin/sh
 
+set -x
 set -eu
 
+standardrb ./src/
 ./tests/realise-minimal-derivations
+./src/derivations-from-json.rb tests/nickel-derivation.json 

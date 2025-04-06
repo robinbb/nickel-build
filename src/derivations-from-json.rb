@@ -8,11 +8,13 @@ require "json"
 json_file = ARGV[0]
 
 def check_for(struct, key_name, value_kind)
+  unless struct.is_a?(Hash)
+    raise "check_for only works on Hashes"
+  end
   unless struct.has_key?(key_name)
     raise "The derivation must have a \"#{key_name}\" entry."
   end
-  v = struct[key_name]
-  unless v.is_a?(value_kind)
+  unless struct[key_name].is_a?(value_kind)
     raise "#{key_name} has the wrong value kind."
   end
 end
@@ -32,18 +34,28 @@ def validate(d)
   # That object must have a "path" key that is an empty string.
   # Each of the entries must not have a similarly named entry
   # in "env", because we are going to add that.
-  env = d["env"]
-  d["outputs"].each_key do |output|
-    if env.has_key?(output)
-      raise "\"env\" must not have an output key (\"#{output}\")."
+  outputs = d["outputs"]
+  outputs.each_key do |output|
+    if d["env"].has_key?(output)
+      raise "The derivation's \"env\" key must not have an output key (\"#{output}\")."
     end
-    check_for(output, "path", String)
+    check_for(outputs[output], "path", String)
+  end
+end
+
+def add_outputs_to_env!(d)
+  env = d["env"]
+  outputs = d["outputs"]
+  outputs.each_key do |output|
+    env[output] = outputs[output]["path"]
   end
 end
 
 def transform(derivation)
   validate(derivation)
   puts "Transforming #{derivation}"
+  add_outputs_to_env!(derivation)
+  puts "Transformed derivation:\n#{derivation}"
 end
 
 begin

@@ -1,5 +1,5 @@
+*.swp
 result
 /.direnv
-.*.swp
 /tests/*.out
 /tests/*.err

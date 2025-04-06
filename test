@@ -7,5 +7,7 @@ def run(cmd, *args)
 end
 
 run "standardrb", "./src/", "./test"
-run "./tests/realise-minimal-derivations"
+run "nix derivation add < tests/minimal-well-formed-derivation.json"
+run "nix derivation add < tests/minimal-derivation.json"
+run "nix-store --realise /nix/store/wxlphg6jjn4g93p89gc50nxki0kkn73y-minimal-derivation.drv"
 run "./src/derivations-from-json.rb", "tests/nickel-derivation.json"

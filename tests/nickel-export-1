@@ -1,0 +1,3 @@
+#!/bin/sh
+set -e
+nickel export tests/nix-base.nickel | ./src/derivations-from-json.rb

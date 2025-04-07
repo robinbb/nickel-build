@@ -1,0 +1,17 @@
+{
+  "args": [
+    "-c",
+    "echo \"hello\" > $out"
+  ],
+  "builder": "/bin/sh",
+  "env": {},
+  "inputDrvs": {},
+  "inputSrcs": [],
+  "name": "nickel-derivation",
+  "outputs": {
+    "out": {
+      "path": ""
+    }
+  },
+  "system": "x86_64-linux"
+}

@@ -8,10 +8,80 @@ end
 
 run "standardrb ./test"
 run "standardrb ./src/"
-# run "nixfmt --check flake.nix"
-# run "nix derivation add < tests/minimal-well-formed-derivation.json"
-# run "nix derivation add < tests/minimal-derivation.json"
+run "nixfmt --check flake.nix"
+
+Dir["tests/**/*"].each do |f|
+  if File.executable?(f)
+    # We run the test by invoking 'f'. The return code is the test result.  If
+    # there is a file named 'f.in', then its contents are made the standard
+    # input of the invocation of 'f'. If there is a file named 'f.exp', then,
+    # in addition to the return code from the invocation of 'f', its results
+    # must match the standard output of the invocation.
+
+    puts "-" * 50
+    puts "Running test: #{f}"
+
+    stdin_data = nil
+    input_file = "#{f}.in"
+    if File.exist?(input_file)
+      stdin_data = File.read(input_file)
+    end
+
+    stdout, stderr, status = Open3.capture3(f, stdin_data: stdin_data)
+
+    success = status.success?
+
+    expected_out_file = "#{f}.exp"
+    if File.exist?(expected_out_file)
+      expected_out = File.read(expected_out_file)
+
+      if stdout == expected_out
+        puts "✓ Output matches expected"
+      else
+        puts "✗ Output doesn't match expected"
+        puts "Expected:"
+        puts expected_out
+        puts "Got:"
+        puts stdout
+        success = false
+      end
+    else
+      unless stdout.nil?
+        puts "Stdout was: #{stdout}"
+        success = false
+      end
+    end
+
+    expected_err_file = "#{f}.err_exp"
+    if File.exist?(expected_err_file)
+      expected_err = File.read(expected_err_file)
+
+      if stderr == expected_err
+        puts "✓ Error output matches expected"
+      else
+        puts "✗ Error output doesn't match expected"
+        puts "Expected:"
+        puts expected_err
+        puts "Got:"
+        puts stderr
+        success = false
+      end
+    else
+      unless stderr.empty?
+        puts "Stderr was: #{stderr}"
+        success = false
+      end
+    end
+
+    if success
+      puts "✓ Test passed"
+    else
+      abort "✗ Test failed (return code #{status.exitstatus})"
+    end
+  end
+end
+
 # run "nix-store --realise /nix/store/wxlphg6jjn4g93p89gc50nxki0kkn73y-minimal-derivation.drv"
 # run "./src/derivations-from-json.rb < tests/nickel-derivation.json"
 # run "nickel export tests/nix-base.nickel"
-run "nickel export tests/nix-base.nickel | ./src/derivations-from-json.rb"
+# run "nickel export tests/nix-base.nickel | ./src/derivations-from-json.rb"

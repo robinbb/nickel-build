@@ -1,0 +1,12 @@
+{
+  NixDerivationSchema =
+    { name | String
+    , outputs | default = { out = { path = "" } }
+    , inputSrcs | Array String | default = [ ]
+    , inputDrvs | default = { }
+    , system | String | default = "x86_64-linux"
+    , builder | String | default = "/bin/sh"
+    , args | Array String
+    , env | default = { }
+    }
+}

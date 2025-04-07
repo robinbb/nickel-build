@@ -7,10 +7,10 @@ require "open3"
 
 def check_for(struct, key_name, value_kind)
   unless struct.is_a?(Hash)
-    raise "check_for only works on Hashes"
+    raise "'check_for' only works on Hashes"
   end
   unless struct.has_key?(key_name)
-    raise "The derivation must have a \"#{key_name}\" entry."
+    raise "Missing \"#{key_name}\" entry."
   end
   unless struct[key_name].is_a?(value_kind)
     raise "#{key_name} has the wrong value kind."

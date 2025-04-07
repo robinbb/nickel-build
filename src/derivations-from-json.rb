@@ -1,7 +1,6 @@
 #! /usr/bin/env -S ruby -w
 
-# Transforms a JSON file with the proper structure into a Nix derivation (.drv
-# file) in the Nix store.
+# Transforms JSON input into a Nix derivation (.drv file) in the Nix store.
 
 require "json"
 require "open3"
@@ -95,18 +94,12 @@ def add_to_store(derivation)
   drv
 end
 
-def build_drv(drv_filename)
-  output = `nix-store --realise #{drv_filename}`
-  puts output
-end
-
 begin
   derivation = JSON.parse($stdin.read)
-  warn "Successfully parsed JSON data from STDIN."
   transform(derivation)
-  # warn JSON.pretty_generate(derivation)
   store_drv = add_to_store(derivation)
-  build_drv(store_drv)
+  puts store_drv
+  # build_drv(store_drv)
 rescue JSON::ParserError => e
   warn "Error parsing JSON: #{e.message}"
 rescue => e

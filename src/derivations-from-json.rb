@@ -69,29 +69,20 @@ def update_store_paths!(d, drv)
 end
 
 def transform(derivation)
-  warn "Transforming #{json_out(derivation)}"
   validate(derivation)
   add_outputs_to_env!(derivation)
-  warn "Transformed derivation:\n#{json_out(derivation)}"
 
   # Attempt to add the derivation to the Nix store in order to obtain an error
   # message that tells the correct output path.
   #
   _stdout, stderr, _status = Open3.capture3("nix derivation add", stdin_data: json_out(derivation))
   drv_output = stderr[/should be '([^']+)'/, 1]
-  warn "drv_output = #{drv_output}"
   update_store_paths!(derivation, drv_output)
 end
 
 def add_to_store(derivation)
-  # Add the now-correct derivation to the Nix store. This validates it and
-  # makes it possible to realise. Use 'nix derivation add' again.
-  #
   stdout, _stderr, _status = Open3.capture3("nix derivation add", stdin_data: json_out(derivation))
-  drv = stdout
-
-  warn "drv = #{drv}"
-  drv
+  stdout
 end
 
 begin
@@ -99,7 +90,6 @@ begin
   transform(derivation)
   store_drv = add_to_store(derivation)
   puts store_drv
-  # build_drv(store_drv)
 rescue JSON::ParserError => e
   warn "Error parsing JSON: #{e.message}"
 rescue => e

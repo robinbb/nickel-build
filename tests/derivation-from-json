@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+./src/derivations-from-json.rb < tests/nickel-derivation.json
+./src/derivations-from-json.rb < tests/nickel-nix-base.exp
